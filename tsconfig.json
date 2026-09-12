@@ -2,6 +2,15 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
-  "references": [],
-  "compilerOptions": {}
+  "references": [
+    {
+      "path": "./api-e2e"
+    },
+    {
+      "path": "./api"
+    }
+  ],
+  "compilerOptions": {
+      "ignoreDeprecations": "6.0"
+  }
 }
