@@ -16,24 +16,24 @@ export class AppController {
 
   @Get('health')
   async getHealth() {
-  try {
-    await this.prisma.$queryRaw`SELECT 1`;
+    try {
+      await this.prisma.$queryRaw`SELECT 1`;
 
-    return {
-      status: true,
-      service: 'store-app-api',
-      database: 'connected',
-    };
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : 'Unknown database error';
+      return {
+        status: true,
+        service: 'store-app-api',
+        database: 'connected',
+      };
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown database error';
 
-    return {
-      status: false,
-      service: 'store-app-api',
-      database: 'disconnected',
-      message,
-    };
+      return {
+        status: false,
+        service: 'store-app-api',
+        database: 'disconnected',
+        message,
+      };
+    }
   }
-}
 }
