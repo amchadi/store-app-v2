@@ -32,6 +32,8 @@ jobs:
 
       - name: Generate Prisma Client
         run: npx prisma generate
+        env:
+          DATABASE_URL: mysql://store_app:store_app@localhost:3306/store_app
 
       - name: Check formatting
         run: npx nx format:check --base="remotes/origin/main"
