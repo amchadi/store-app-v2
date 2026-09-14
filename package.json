@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev:api": "nx serve api --watch"
+    "dev:api": "nx serve api --watch",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,cjs,mjs,ts,tsx,json,md,yml,yaml,css,scss,html}": "prettier --write"
   },
   "private": true,
   "devDependencies": {
@@ -26,9 +30,11 @@
     "@types/node": "^24.0.0",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
+    "husky": "^9.1.7",
     "jest": "~30.3.0",
     "jest-environment-node": "~30.3.0",
     "jest-util": "~30.3.0",
+    "lint-staged": "^16.4.0",
     "nx": "23.1.1",
     "prettier": "^3.8.1",
     "ts-jest": "^29.4.7",
