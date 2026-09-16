@@ -15,6 +15,30 @@ jobs:
     name: CI Check
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: store_app
+          MYSQL_USER: store_app
+          MYSQL_PASSWORD: store_app
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DATABASE_URL: mysql://store_app:store_app@127.0.0.1:3306/store_app
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: store_app
+      DB_PASSWORD: store_app
+      DB_NAME: store_app
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -32,8 +56,6 @@ jobs:
 
       - name: Generate Prisma Client
         run: npx prisma generate
-        env:
-          DATABASE_URL: mysql://store_app:store_app@localhost:3306/store_app
 
       - name: Check formatting
         run: npx nx format:check --base="remotes/origin/main"
@@ -42,4 +64,4 @@ jobs:
         run: npx nx run-many -t lint test build typecheck
 
       - name: Run E2E
-        run: npx nx e2e @org/api-e2e --verbose
+        run: npx nx e2e @org/api-e2e --verboseoo
