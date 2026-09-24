@@ -53,3 +53,4 @@ test-output
 /generated/prisma
 # Nest 
 .env
+.angular
