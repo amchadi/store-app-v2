@@ -8,6 +8,12 @@
     },
     {
       "path": "./api"
+    },
+    {
+      "path": "./mobile-e2e"
+    },
+    {
+      "path": "./mobile"
     }
   ],
   "compilerOptions": {
