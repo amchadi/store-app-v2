@@ -1,108 +1,362 @@
-# New Nx Repository
+# Store App V2
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+Store App V2 is a multi-store management application built with NestJS, Ionic, Angular, Nx, Prisma and MySQL.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Tech Stack
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/docs/technologies/typescript/introduction?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-🚀 If you haven't connected to Nx Cloud yet, [complete your setup here](https://cloud.nx.app/get-started). Get faster builds with remote caching, distributed task execution, and self-healing CI. [See how your workspace can benefit](#nx-cloud).
+- Nx Monorepo
+- NestJS
+- Angular
+- Ionic
+- Prisma
+- MySQL
+- Docker
+- Jest
+- Playwright
 
-## Generate a library
+## Requirements
+
+Before starting, make sure you have installed:
+
+- Node.js
+- npm
+- Docker
+- Git
+
+## Installation
+
+Clone the repository and install dependencies:
 
 ```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+npm install
 ```
 
-## Run tasks
-
-To build the library use:
+Create your local environment file from `.env.example`.
 
 ```sh
-npx nx run pkg1:build
+cp .env.example .env
 ```
 
-To run any task with Nx use:
+> On Windows, you can also copy `.env.example` manually and rename the copy to `.env`.
+
+The `.env` file contains local credentials and must not be committed.
+
+## Running the application
+
+### Start the database
+
+Start MySQL and phpMyAdmin:
 
 ```sh
-npx nx run <project-name>:<target>
+docker compose up -d
 ```
 
-These targets are either [inferred automatically](https://nx.dev/docs/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Check that the containers are running:
 
-[More about running tasks in the docs &raquo;](https://nx.dev/docs/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Versioning and releasing
-
-To version and release the library use
-
-```
-npx nx release
+```sh
+docker compose ps
 ```
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+MySQL runs on:
 
-[Learn more about Nx release &raquo;](https://nx.dev/docs/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```text
+localhost:3306
+```
 
-## Keep TypeScript project references up to date
+phpMyAdmin is available at:
 
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
+```text
+http://localhost:8080
+```
 
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
+### Run the NestJS API
+
+Start the backend in development mode:
+
+```sh
+npm run dev:api
+```
+
+The API is available at:
+
+```text
+http://localhost:3000/api
+```
+
+Swagger documentation:
+
+```text
+http://localhost:3000/api/docs
+```
+
+Database health check:
+
+```text
+http://localhost:3000/api/health
+```
+
+### Run the Ionic application
+
+Start the Ionic/Angular frontend:
+
+```sh
+npx nx serve mobile
+```
+
+The application is available at:
+
+```text
+http://localhost:4200
+```
+
+### Run backend and frontend together
+
+Use two terminals.
+
+Terminal 1 — NestJS:
+
+```sh
+npm run dev:api
+```
+
+Terminal 2 — Ionic:
+
+```sh
+npx nx serve mobile
+```
+
+## Database
+
+Store App V2 uses MySQL with Prisma as the persistence layer.
+
+### Environment variables
+
+The following variables are required in the local `.env` file:
+
+```env
+DATABASE_URL=mysql://store_app:store_app@localhost:3306/store_app
+
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=store_app
+DB_PASSWORD=store_app
+DB_NAME=store_app
+```
+
+The `.env` file must not be committed.
+
+Use `.env.example` as the reference configuration.
+
+### Test the database connection
+
+Make sure Docker is running:
+
+```sh
+docker compose up -d
+```
+
+Then run:
+
+```sh
+npm run db:test
+```
+
+A successful connection returns:
+
+```text
+Database connection: true
+```
+
+If the database cannot be reached:
+
+```text
+Database connection: false
+```
+
+The command also returns a non-zero exit code when the connection fails.
+
+### Generate Prisma Client
+
+```sh
+npm run db:generate
+```
+
+### Development migrations
+
+Create and apply development migrations:
+
+```sh
+npm run db:migrate
+```
+
+Prisma migration files are stored in:
+
+```text
+prisma/migrations
+```
+
+### Deploy migrations
+
+Apply existing migrations without creating new ones:
+
+```sh
+npm run db:migrate:deploy
+```
+
+This command is intended for deployed environments and CI/CD workflows.
+
+### Database seed
+
+Run:
+
+```sh
+npm run db:seed
+```
+
+The seed entry point is:
+
+```text
+prisma/seed.ts
+```
+
+The seed infrastructure is prepared for initial application data such as stores, users, roles and other required records as the corresponding domain models are introduced.
+
+### Reset the local database
+
+```sh
+npm run db:reset
+```
+
+> Warning: this command deletes local database data and reapplies the migration history. It is intended for local development only.
+
+### Migration rollback strategy
+
+Prisma does not provide an automatic `migrate rollback` command.
+
+For local development, the database can be rebuilt from the migration history using:
+
+```sh
+npm run db:reset
+```
+
+For deployed environments, an existing migration should not simply be removed after it has been applied.
+
+Schema changes should instead be reverted through a corrective migration that explicitly restores the required schema state.
+
+## Database commands
+
+| Command                     | Description                         |
+| --------------------------- | ----------------------------------- |
+| `npm run db:test`           | Test the database connection        |
+| `npm run db:generate`       | Generate Prisma Client              |
+| `npm run db:migrate`        | Create/apply development migrations |
+| `npm run db:migrate:deploy` | Apply existing migrations           |
+| `npm run db:seed`           | Run database seed                   |
+| `npm run db:reset`          | Reset the local database            |
+
+## Tests and validation
+
+Run lint, unit tests, builds and type checking:
+
+```sh
+npx nx run-many -t lint test build typecheck
+```
+
+### Backend E2E
+
+```sh
+npx nx e2e @org/api-e2e
+```
+
+### Mobile E2E
+
+```sh
+npx nx e2e mobile-e2e
+```
+
+The mobile E2E suite uses Playwright.
+
+If Playwright browsers are not installed yet:
+
+```sh
+npx playwright install
+```
+
+Then run the E2E tests again.
+
+## Formatting
+
+Check project formatting:
+
+```sh
+npx nx format:check --base="remotes/origin/main"
+```
+
+## Useful Nx commands
+
+Display the project graph:
+
+```sh
+npx nx graph
+```
+
+Synchronize TypeScript project references:
 
 ```sh
 npx nx sync
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+Check that project references are synchronized:
 
 ```sh
 npx nx sync:check
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+## Project structure
 
-## Nx Cloud
-
-Nx Cloud ensures a [fast and scalable CI](https://nx.dev/nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/docs/features/ci-features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/docs/features/ci-features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/docs/features/ci-features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/docs/features/ci-features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Set up CI (non-Github Actions CI)
-
-**Note:** This is only required if your CI provider is not GitHub Actions.
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
+```text
+store-app-v2/
+├── api/                 # NestJS backend
+├── api-e2e/             # Backend E2E tests
+├── mobile/              # Ionic / Angular application
+├── mobile-e2e/          # Playwright mobile E2E tests
+├── prisma/              # Prisma schema, migrations and seed
+├── scripts/             # Development scripts
+├── .github/workflows/   # GitHub Actions CI
+├── docker-compose.yml   # MySQL and phpMyAdmin
+└── package.json
 ```
 
-[Learn more about Nx on CI](https://nx.dev/docs/features/ci-features?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Development workflow
 
-## Install Nx Console
+Development is organized using GitHub Issues and pull requests.
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+Typical workflow:
 
-[Install Nx Console &raquo;](https://nx.dev/docs/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```text
+Issue
+  ↓
+Branch
+  ↓
+Development
+  ↓
+Tests
+  ↓
+Pull Request
+  ↓
+CI Check
+  ↓
+Merge
+```
 
-## 🔗 Learn More
+Before creating a pull request, make sure the project passes:
 
-- [Nx Documentation](https://nx.dev/docs)
-- [Crafting Your Workspace Tutorial](https://nx.dev/docs/getting-started/tutorials/crafting-your-workspace)
-- [Module Boundaries](https://nx.dev/docs/features/enforce-module-boundaries)
-- [Releasing Packages](https://nx.dev/docs/features/manage-releases)
-- [Nx Plugins](https://nx.dev/docs/concepts/nx-plugins)
-- [Nx Cloud](https://nx.dev/nx-cloud)
+```sh
+npx nx run-many -t lint test build typecheck
+```
 
-## 💬 Community
+and:
 
-Join the Nx community:
-
-- [Discord](https://go.nx.dev/community)
-- [X (Twitter)](https://twitter.com/nxdevtools)
-- [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [YouTube](https://www.youtube.com/@nxdevtools)
-- [Blog](https://nx.dev/blog)
+```sh
+npx nx format:check --base="remotes/origin/main"
+```

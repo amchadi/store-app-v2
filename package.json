@@ -4,7 +4,13 @@
   "license": "MIT",
   "scripts": {
     "dev:api": "nx serve api --watch",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:test": "tsx scripts/test-db.ts",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma migrate reset"
   },
   "lint-staged": {
     "*.{js,cjs,mjs,ts,tsx,json,md,yml,yaml,css,scss,html}": "prettier --write"
@@ -56,6 +62,7 @@
     "ts-jest": "^29.4.7",
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.58.0",
     "webpack": "^5.101.3",
